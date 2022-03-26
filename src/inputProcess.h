@@ -1,9 +1,12 @@
+#ifndef INPUTPROCESS
+#define INPUTPROCESS
+#pragma once
 #include "stdio.h"
 #include <iostream>
 #include <fstream>
 #include "word.h"
 #include "regex"
-
+#endif
 
 map<char, bool> params = {
 	{'n', false},
@@ -15,7 +18,7 @@ map<char, bool> params = {
 	{'r', false}
 };
 string fileName;
-char head, tail;
+char head = 0, tail = 0;
 
 inline int fromChar2Index(char c) {
 	return c - 'a';
@@ -32,7 +35,7 @@ void insertWord(string wordContent) {
 		if (params['c']) {
 			auto iter = wordList->listOfWord.begin();
 			for (;iter != wordList->listOfWord.end() &&
-                          (*iter)->wordLength < length; ++iter) { } // TODO 可以只将第一个设置为最大
+                          (*iter)->wordLength > length; ++iter) { } // TODO 可以只将第一个设置为最大
 			wordList->listOfWord.insert(iter, newWord);
 		}
 		else
@@ -66,6 +69,9 @@ void readWordFromFile() {
 				wordContent = "";
 			}
 		}
+        if (wordContent.length() > 1) {
+            insertWord(wordContent);
+        }
 		inputFile.close();
 	}
 	else { // 文件不存在
@@ -90,7 +96,7 @@ void analyzeParam(int argc, char* argv[]) {
 	regex reg(".*\.txt"); // 正则表达式
 	for (int i = 1; i < argc; ++i) {
 		string arg = argv[i];
-        cout << arg << endl;
+//        cout << arg << endl;
 		if (arg[0] == '-') {
 			if (arg.length() == 2) {
 				char c = arg[1];
@@ -161,6 +167,14 @@ void analyzeParam(int argc, char* argv[]) {
     }
 
 }
+
+void inputProcess(int argc, char *argv[]){
+    initAlphabet();
+    analyzeParam(argc, argv);
+    readWordFromFile();
+//    cout << "======THE END=======" << endl;
+}
+
 
 // 报错
 
