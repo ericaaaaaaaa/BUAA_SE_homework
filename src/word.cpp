@@ -29,3 +29,31 @@ void FunctionM() {
 	//长度为单词列表长度
 }
 
+#include "inputProcess.h"
+
+int main(int argc, char* argv[]) {
+    try {
+        initAlphabet();
+        analyzeParam(argc, argv);
+        cout << "FileName: " << fileName << endl;
+        cout << "Parameters:\t" << "-n: " << params['n'] <<
+                                "\t-w: " << params['w'] <<
+                                "\t-c: " << params['c'] <<
+                                "\t-m: " << params['m'] <<
+                                "\t-h: " << params['h'] <<
+                                "\t-t: " << params['t'] <<
+                                "\t-r: " << params['r'] << endl;
+        readWordFromFile();
+        for (int i = 0; i < 26; ++i) {
+            for (int j = 0; j < 26; ++j) {
+                for (auto iter = alphabet[i][j]->listOfWord.begin();
+                    iter != alphabet[i][j]->listOfWord.end(); ++iter) {
+                    cout << "alphabet[" << char('a' + i) << "][" << char('a' + j) << "]: " << (*iter)->wordContent << "\tLength: " << (*iter)->wordLength << endl;
+                }
+            }
+        }
+        cout << "======THE END=======" << endl;
+    } catch (const char* msg) {
+        cout << msg << endl;
+    }
+}
