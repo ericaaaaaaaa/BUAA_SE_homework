@@ -30,5 +30,7 @@ public:
 //	int listLength;
 //};
 map<string, bool> dirty;
-//struct wordList* alphabet[26][26];
 WordList* alphabet[26][26];
+
+bool CycleDetection() ;
+bool CycleVisitDetection(int i, int *, int *);

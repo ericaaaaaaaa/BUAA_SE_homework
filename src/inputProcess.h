@@ -1,9 +1,12 @@
+#ifndef INPUTPROCESS
+#define INPUTPROCESS
+#pragma once
 #include "stdio.h"
 #include <iostream>
 #include <fstream>
 #include "word.h"
 #include "regex"
-
+#endif
 
 map<char, bool> params = {
 	{'n', false},
@@ -32,7 +35,7 @@ void insertWord(string wordContent) {
 		if (params['c']) {
 			auto iter = wordList->listOfWord.begin();
 			for (;iter != wordList->listOfWord.end() &&
-                          (*iter)->wordLength < length; ++iter) { } // TODO 可以只将第一个设置为最大
+                          (*iter)->wordLength > length; ++iter) { } // TODO 可以只将第一个设置为最大
 			wordList->listOfWord.insert(iter, newWord);
 		}
 		else
@@ -66,6 +69,9 @@ void readWordFromFile() {
 				wordContent = "";
 			}
 		}
+        if (wordContent.length() > 1) {
+            insertWord(wordContent);
+        }
 		inputFile.close();
 	}
 	else { // 文件不存在
@@ -161,6 +167,15 @@ void analyzeParam(int argc, char* argv[]) {
     }
 
 }
+
+void inputProcess(int argc, char *argv[]){
+    initAlphabet();
+    analyzeParam(argc, argv);
+    readWordFromFile();
+    cout << "======THE END=======" << endl;
+
+}
+
 
 // 报错
 
