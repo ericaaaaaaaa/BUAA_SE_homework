@@ -153,6 +153,36 @@ list<string> findGreatestWDFS(int row, int column) {
     return result;
 }
 
+list<string> findGreatestWDFS_R(int row, int column) {
+    auto *wordList = alphabet[row][column];
+    list<string> result;
+    if (wordList->listLength > 0) {
+        auto iter = wordList->listOfWord.begin();
+        for (; iter != wordList->listOfWord.end() && dirty[(*iter)->wordContent]; ++iter) {}
+        if (iter == wordList->listOfWord.end()) return result;
+        string currentWord = (*iter)->wordContent;
+        if (dirty[currentWord]) return result;
+        dirty[currentWord] = true;
+        result.push_back(currentWord);
+        list<string> maxWordAfter;
+        int maxLength = 0;
+        for (int i = 0; i < 26; ++i) {
+            if (alphabet[column][i]->listLength != 0) {
+                auto wordAfter = findGreatestWDFS_R(column, i);
+
+                int curLength = wordAfter.size();
+                if (curLength > maxLength) {
+                    maxLength = curLength;
+                    maxWordAfter = wordAfter;
+                }
+            }
+        }
+        result.splice(result.end(), maxWordAfter);
+        dirty[currentWord] = false;
+    }
+    return result;
+}
+
 list<string> findGreatestWDFSReverse(int row, int column) {
     list<string> maxWordList;
     if (alphabet[row][column]->listLength > 0) {
@@ -179,6 +209,36 @@ list<string> findGreatestWDFSReverse(int row, int column) {
     return maxWordList;
 }
 
+list<string> findGreatestWDFSReverse_R(int row, int column) {
+    list<string> maxWordList;
+    auto *wordList = alphabet[row][column];
+    if (wordList->listLength > 0) {
+        auto iter = wordList->listOfWord.begin();
+        for (; iter != wordList->listOfWord.end() && dirty[(*iter)->wordContent]; ++iter) {}
+        if (iter == wordList->listOfWord.end()) return maxWordList;
+        string word = (*iter)->wordContent;
+        if (dirty[word]) return maxWordList;
+        else {
+            dirty[word] = true;
+            int maxLength = 0;
+            for (int index = 0; index < 26; ++index) {
+                auto *wordList = alphabet[index][row];
+                if (wordList->listLength > 0) {
+                    auto curList = findGreatestWDFSReverse_R(index, row);
+                    int curLength = curList.size();
+                    if (curLength > maxLength) {
+                        maxLength = curLength;
+                        maxWordList = curList;
+                    }
+                }
+            }
+            maxWordList.push_back(word);
+            dirty[word] = true;
+        }
+    }
+    return maxWordList;
+}
+
 list<string> findGreatestWDFS(int row, int column, char t) { // 指定尾的 DFS
     auto *wordList = alphabet[row][column];
     list<string> result;
@@ -191,6 +251,39 @@ list<string> findGreatestWDFS(int row, int column, char t) { // 指定尾的 DFS
         for (int i = 0; i < 26; ++i) {
             if (alphabet[column][i]->listLength != 0) {
                 auto wordAfter = findGreatestWDFS(column, i, t);
+                if (!checkTailOk(wordAfter)) continue;
+                int curLength = wordAfter.size();
+                if (curLength > maxLength) {
+                    maxLength = curLength;
+                    maxWordAfter = wordAfter;
+                }
+            }
+        }
+        result.push_back(currentWord);
+        result.splice(result.end(), maxWordAfter);
+        if (!checkTailOk(result)) {
+            result.clear();
+        }
+        dirty[currentWord] = false;
+    }
+    return result;
+}
+
+list<string> findGreatestWDFS_R(int row, int column, char t) { // 指定尾的 DFS
+    auto *wordList = alphabet[row][column];
+    list<string> result;
+    if (wordList->listLength > 0) {
+        auto iter = wordList->listOfWord.begin();
+        for (; iter != wordList->listOfWord.end() && dirty[(*iter)->wordContent]; ++iter) {}
+        if (iter == wordList->listOfWord.end()) return result;
+        string currentWord = (*iter)->wordContent;
+        if (dirty[currentWord]) return result;
+        dirty[currentWord] = true;
+        list<string> maxWordAfter;
+        int maxLength = 0;
+        for (int i = 0; i < 26; ++i) {
+            if (alphabet[column][i]->listLength != 0) {
+                auto wordAfter = findGreatestWDFS_R(column, i, t);
                 if (!checkTailOk(wordAfter)) continue;
                 int curLength = wordAfter.size();
                 if (curLength > maxLength) {
@@ -243,6 +336,35 @@ list<string> findGreatestCDFS(int row, int column) {
     return result;
 }
 
+list<string> findGreatestCDFS_R(int row, int column) {
+    auto *wordList = alphabet[row][column];
+    list<string> result;
+    if (wordList->listLength > 0) {
+        auto iter = wordList->listOfWord.begin();
+        for (; iter != wordList->listOfWord.end() && dirty[(*iter)->wordContent]; ++iter) {}
+        if (iter == wordList->listOfWord.end()) return result;
+        string currentWord = (*iter)->wordContent;
+        if (dirty[currentWord]) return result;
+        dirty[currentWord] = true;
+        result.push_back(currentWord);
+        list<string> maxWordAfter;
+        int maxLength = 0;
+        for (int i = 0; i < 26; ++i) {
+            if (alphabet[column][i]->listLength != 0) {
+                auto wordAfter = findGreatestCDFS_R(column, i);
+                int curLength = getLength(wordAfter);
+                if (curLength > maxLength) {
+                    maxLength = curLength;
+                    maxWordAfter = wordAfter;
+                }
+            }
+        }
+        result.splice(result.end(), maxWordAfter);
+        dirty[currentWord] = false;
+    }
+    return result;
+}
+
 list<string> findGreatestCDFSReverse(int row, int column) {
     list<string> maxWordList;
     if (alphabet[row][column]->listLength > 0) {
@@ -255,6 +377,36 @@ list<string> findGreatestCDFSReverse(int row, int column) {
                 auto *wordList = alphabet[index][row];
                 if (wordList->listLength > 0) {
                     auto curList = findGreatestCDFSReverse(index, row);
+                    int curLength = getLength(curList);
+                    if (curLength > maxLength) {
+                        maxLength = curLength;
+                        maxWordList = curList;
+                    }
+                }
+            }
+            maxWordList.push_back(word);
+            dirty[word] = true;
+        }
+    }
+    return maxWordList;
+}
+
+list<string> findGreatestCDFSReverse_R(int row, int column) {
+    list<string> maxWordList;
+    auto *wordList = alphabet[row][column];
+    if (wordList->listLength > 0) {
+        auto iter = wordList->listOfWord.begin();
+        for (; iter != wordList->listOfWord.end() && dirty[(*iter)->wordContent]; ++iter) {}
+        if (iter == wordList->listOfWord.end()) return maxWordList;
+        string word = (*iter)->wordContent;
+        if (dirty[word]) return maxWordList;
+        else {
+            dirty[word] = true;
+            int maxLength = 0;
+            for (int index = 0; index < 26; ++index) {
+                auto *wordList = alphabet[index][row];
+                if (wordList->listLength > 0) {
+                    auto curList = findGreatestCDFSReverse_R(index, row);
                     int curLength = getLength(curList);
                     if (curLength > maxLength) {
                         maxLength = curLength;
@@ -282,6 +434,39 @@ list<string> findGreatestCDFS(int row, int column, char t) { // 指定尾
         for (int i = 0; i < 26; ++i) {
             if (alphabet[column][i]->listLength != 0) {
                 auto wordAfter = findGreatestCDFS(column, i, t);
+                if (!checkTailOk(wordAfter)) continue;
+                int curLength = getLength(wordAfter);
+                if (curLength > maxLength) {
+                    maxLength = curLength;
+                    maxWordAfter = wordAfter;
+                }
+            }
+        }
+        result.splice(result.end(), maxWordAfter);
+        if (!checkTailOk(result)) {
+            result.clear();
+        }
+        dirty[currentWord] = false;
+    }
+    return result;
+}
+
+list<string> findGreatestCDFS_R(int row, int column, char t) { // 指定尾
+    auto *wordList = alphabet[row][column];
+    list<string> result;
+    if (wordList->listLength > 0) {
+        auto iter = wordList->listOfWord.begin();
+        for (; iter != wordList->listOfWord.end() && dirty[(*iter)->wordContent]; ++iter) {}
+        if (iter == wordList->listOfWord.end()) return result;
+        string currentWord = (*iter)->wordContent;
+        if (dirty[currentWord]) return result;
+        dirty[currentWord] = true;
+        result.push_back(currentWord);
+        list<string> maxWordAfter;
+        int maxLength = 0;
+        for (int i = 0; i < 26; ++i) {
+            if (alphabet[column][i]->listLength != 0) {
+                auto wordAfter = findGreatestCDFS_R(column, i, t);
                 if (!checkTailOk(wordAfter)) continue;
                 int curLength = getLength(wordAfter);
                 if (curLength > maxLength) {
@@ -356,6 +541,61 @@ list<string> FunctionW_noR() {
     }
 }
 
+list<string> FunctionW_R() {
+    //找到入度为0的“头尾”，然后遍历这些点（“头尾”相同的作为开头只找一次)，用Dijkstra寻找最大
+    //W长度为单词列表长度，C长度为单词字母总长
+    if (head == 0 && tail == 0) { // 如果没有指定头尾
+        list<string> maxListOfWords;
+        int maxLength = 0;
+        for (int i = 0; i < 26; i++) {
+            for (int j = 0; j < 26; ++j) {
+                auto curWordList = findGreatestWDFS_R(i, j);
+                int curLength = curWordList.size();
+                if (curLength > maxLength) {
+                    maxLength = curLength;
+                    maxListOfWords = curWordList;
+                }
+            }
+        }
+        return maxListOfWords;
+    } else {
+        list<string> maxListOfWords;
+        int maxLength = 0;
+        if (head != 0 && tail != 0) { // 指定了头和尾
+            int i = fromChar2Index(head);
+            for (int j = 0; j < 26; ++j) {
+                auto curWordList = findGreatestWDFS_R(i, j, tail);
+                int curLength = curWordList.size();
+                if (curLength > maxLength) {
+                    maxLength = curLength;
+                    maxListOfWords = curWordList;
+                }
+            }
+        } else if (head != 0) { // 只指定了头
+            int i = fromChar2Index(head);
+            for (int j = 0; j < 26; ++j) {
+                auto curWordList = findGreatestWDFS_R(i, j);
+                int curLength = curWordList.size();
+                if (curLength > maxLength) {
+                    maxLength = curLength;
+                    maxListOfWords = curWordList;
+                }
+            }
+        } else { // 指定了尾
+            int j = fromChar2Index(tail);
+            for (int i = 0; i < 26; i++) {
+                auto curWordList = findGreatestWDFSReverse_R(i, j);
+                int curLength = curWordList.size();
+                if (curLength > maxLength) {
+                    maxLength = curLength;
+                    maxListOfWords = curWordList;
+                }
+            }
+        }
+        return maxListOfWords;
+    }
+}
+
 list<string> FunctionC_noR() {
     //找到入度为0的“头尾”，然后遍历这些点（“头尾”相同的作为开头只找一次)，用Dijkstra寻找最大
     //W长度为单词列表长度，C长度为单词字母总长
@@ -413,6 +653,61 @@ list<string> FunctionC_noR() {
     }
 }
 
+list<string> FunctionC_R() {
+    //找到入度为0的“头尾”，然后遍历这些点（“头尾”相同的作为开头只找一次)，用Dijkstra寻找最大
+    //W长度为单词列表长度，C长度为单词字母总长
+    if (head == 0 && tail == 0) { // 如果没有指定头尾
+        list<string> maxListOfWords;
+        int maxLength = 0;
+        for (int i = 0; i < 26; i++) {
+            for (int j = 0; j < 26; ++j) {
+                auto curWordList = findGreatestCDFS_R(i, j);
+                int curLength = getLength(curWordList);
+                if (curLength > maxLength) {
+                    maxLength = curLength;
+                    maxListOfWords = curWordList;
+                }
+            }
+        }
+        return maxListOfWords;
+    } else {
+        list<string> maxListOfWords;
+        int maxLength = 0;
+        if (head != 0 && tail != 0) { // 指定了头和尾
+            int i = fromChar2Index(head);
+            for (int j = 0; j < 26; ++j) {
+                auto curWordList = findGreatestCDFS_R(i, j, tail);
+                int curLength = getLength(curWordList);
+                if (curLength > maxLength) {
+                    maxLength = curLength;
+                    maxListOfWords = curWordList;
+                }
+            }
+        } else if (head != 0) { // 只指定了头
+            int i = fromChar2Index(head);
+            for (int j = 0; j < 26; ++j) {
+                auto curWordList = findGreatestCDFS_R(i, j);
+                int curLength = getLength(curWordList);
+                if (curLength > maxLength) {
+                    maxLength = curLength;
+                    maxListOfWords = curWordList;
+                }
+            }
+        } else { // 指定了尾
+            int j = fromChar2Index(tail);
+            for (int i = 0; i < 26; i++) {
+                auto curWordList = findGreatestCDFSReverse_R(i, j);
+                int curLength = getLength(curWordList);
+                if (curLength > maxLength) {
+                    maxLength = curLength;
+                    maxListOfWords = curWordList;
+                }
+            }
+        }
+        return maxListOfWords;
+    }
+}
+
 //  aaa ab， m生效
 //此外和N_noR相同
 
@@ -440,7 +735,7 @@ int main(int argc, char *argv[]) {
             for (auto iter = outputWordList.begin(); iter != outputWordList.end(); ++iter) {
                 cout << (*iter) << endl;
             }
-        } else {
+        } else if (!containsLoop) { // 没有环路
             ofstream outFile;
             outFile.open("solution.txt", ios::out);
             if (params['w']) {
@@ -453,6 +748,27 @@ int main(int argc, char *argv[]) {
                 }
             } else if (params['c']) {
                 auto outputWordList = FunctionC_noR();
+                if (outputWordList.size() > 1) {
+                    for (auto iter = outputWordList.begin(); iter != outputWordList.end(); ++iter) {
+                        outFile << (*iter) << endl;
+                        cout << (*iter) << endl;
+                    }
+                }
+            }
+            outFile.close();
+        } else { // 有环路
+            ofstream outFile;
+            outFile.open("solution.txt", ios::out);
+            if (params['w']) {
+                auto outputWordList = FunctionW_R();
+                if (outputWordList.size() > 1) {
+                    for (auto iter = outputWordList.begin(); iter != outputWordList.end(); ++iter) {
+                        outFile << (*iter) << endl;
+                        cout << (*iter) << endl;
+                    }
+                }
+            } else if (params['c']) {
+                auto outputWordList = FunctionC_R();
                 if (outputWordList.size() > 1) {
                     for (auto iter = outputWordList.begin(); iter != outputWordList.end(); ++iter) {
                         outFile << (*iter) << endl;
