@@ -15,8 +15,8 @@
 用动态库时
 
 - 有两轮获取指针，一个是	`HMODULE hModule = LoadLibrary(_T("core.dll"));`,动态库dllmain中定义的一个入口，一个是`functionC C = (functionC)GetProcAddress(hModule,"gen_chain_char");`，functionC是参数“元组”？指针类型，这两个其中一个得到了NULL的值，都会导致dll调用失败
-- `HMODULE hModule`失败，是vs平台选错了= =，或者传入地址错了，或者和Unicode、string等格式类型有关
-  - x86 or x64 ? ：error = 173(好像是，不想复现了)
+- `HMODULE hModule`失败，是vs平台选错了= =，或者传入地址错了，或者和Unicode、LPCSTR、string等格式类型有关
+  - x86 or x64 ? ：error = 173(好像是，不想复现了)用`cout<<GetLastError()<<endl;`查看error的情况
   - 传入地址错了
   - Unicode、string : _T("core.dll");   _T是#include "tchar.h"中的宏定义 ，如果没有 _T转化也会导致错误，如果没有include直接无法编译
 - GetProcAddress
