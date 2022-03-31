@@ -9,7 +9,7 @@
 #include "exceptionPackage.h"
 #endif //CLIONWORDLIST_CORE_H
 
-class Core {
+class Core{
 
 public:
     //words为输入的单词列表，len为单词列表的长度，result存放单词链，函数返回值为单词链长度。

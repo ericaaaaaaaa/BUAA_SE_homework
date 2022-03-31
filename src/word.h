@@ -74,6 +74,7 @@ list<string> FunctionC_R();
 
 void FunctionWC_noR();
 
+void FunctionM0();
 void FunctionM();
 //-------------------
 

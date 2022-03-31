@@ -27,6 +27,11 @@ struct LoopException : public exception
 
 struct ResultContainException : public exception
 {
+    ResultContainException(int i) {
+        length = i;
+    }
+
+    int length;
     const char * what () const throw ()
     {
         return "ERROR: the result list length is constrained in 20000.";

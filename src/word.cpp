@@ -4,7 +4,8 @@ list<string> outputWordList;
 int degree[26][2]; // 0->in, 1->out
 map<string, bool> dirty;
 WordList *alphabet[26][26];
-
+char head = paramHead;
+char tail = paramTail;
 
 
 inline int fromChar2Index(char c) {
@@ -75,6 +76,7 @@ bool CycleVisitDetection(int i, int *cycleFind, int *allFind) {
 }
 
 bool CycleDetection() {
+    cout << "====CycleDetection=====" << endl;
     int i;
     int cycleFind[26] = {0}, allFind[26] = {0};
     for (i = 0; i < 26; i++) {
@@ -133,7 +135,7 @@ void FunctionN_noR() {
 inline bool checkTailOk(list<string> wordList) {
     if (!wordList.empty()) {
         string word = wordList.back();
-        if (word[word.size() - 1] == paramTail) return true;
+        if (word[word.size() - 1] == tail) return true;
         return false;
     } else {
         return false;
@@ -501,7 +503,7 @@ list<string> findGreatestCDFS_R(int row, int column, char t) { // 指定尾
 list<string> FunctionW_noR() {
     //找到入度为0的“头尾”，然后遍历这些点（“头尾”相同的作为开头只找一次)，用Dijkstra寻找最大
     //W长度为单词列表长度，C长度为单词字母总长
-    if (paramHead == 0 && paramTail == 0) { // 如果没有指定头尾
+    if (head == 0 && tail == 0) { // 如果没有指定头尾
         list<string> maxListOfWords;
         int maxLength = 0;
         for (int i = 0; i < 26; i++) {
@@ -520,18 +522,18 @@ list<string> FunctionW_noR() {
     } else {
         list<string> maxListOfWords;
         int maxLength = 0;
-        if (paramHead != 0 && paramTail != 0) { // 指定了头和尾
-            int i = fromChar2Index(paramHead);
+        if (head != 0 && tail != 0) { // 指定了头和尾
+            int i = fromChar2Index(head);
             for (int j = 0; j < 26; ++j) {
-                auto curWordList = findGreatestWDFS(i, j, paramTail);
+                auto curWordList = findGreatestWDFS(i, j, tail);
                 int curLength = curWordList.size();
                 if (curLength > maxLength) {
                     maxLength = curLength;
                     maxListOfWords = curWordList;
                 }
             }
-        } else if (paramHead != 0) { // 只指定了头
-            int i = fromChar2Index(paramHead);
+        } else if (head != 0) { // 只指定了头
+            int i = fromChar2Index(head);
             for (int j = 0; j < 26; ++j) {
                 auto curWordList = findGreatestWDFS(i, j);
                 int curLength = curWordList.size();
@@ -541,7 +543,7 @@ list<string> FunctionW_noR() {
                 }
             }
         } else { // 指定了尾
-            int j = fromChar2Index(paramTail);
+            int j = fromChar2Index(tail);
             for (int i = 0; i < 26; i++) {
                 auto curWordList = findGreatestWDFSReverse(i, j);
                 int curLength = curWordList.size();
@@ -558,7 +560,7 @@ list<string> FunctionW_noR() {
 list<string> FunctionW_R() {
     //找到入度为0的“头尾”，然后遍历这些点（“头尾”相同的作为开头只找一次)，用Dijkstra寻找最大
     //W长度为单词列表长度，C长度为单词字母总长
-    if (paramHead == 0 && paramTail == 0) { // 如果没有指定头尾
+    if (head == 0 && tail == 0) { // 如果没有指定头尾
         list<string> maxListOfWords;
         int maxLength = 0;
         for (int i = 0; i < 26; i++) {
@@ -575,18 +577,18 @@ list<string> FunctionW_R() {
     } else {
         list<string> maxListOfWords;
         int maxLength = 0;
-        if (paramHead != 0 && paramTail != 0) { // 指定了头和尾
-            int i = fromChar2Index(paramHead);
+        if (head != 0 && tail != 0) { // 指定了头和尾
+            int i = fromChar2Index(head);
             for (int j = 0; j < 26; ++j) {
-                auto curWordList = findGreatestWDFS_R(i, j, paramTail);
+                auto curWordList = findGreatestWDFS_R(i, j, tail);
                 int curLength = curWordList.size();
                 if (curLength > maxLength) {
                     maxLength = curLength;
                     maxListOfWords = curWordList;
                 }
             }
-        } else if (paramHead != 0) { // 只指定了头
-            int i = fromChar2Index(paramHead);
+        } else if (head != 0) { // 只指定了头
+            int i = fromChar2Index(head);
             for (int j = 0; j < 26; ++j) {
                 auto curWordList = findGreatestWDFS_R(i, j);
                 int curLength = curWordList.size();
@@ -596,7 +598,7 @@ list<string> FunctionW_R() {
                 }
             }
         } else { // 指定了尾
-            int j = fromChar2Index(paramTail);
+            int j = fromChar2Index(tail);
             for (int i = 0; i < 26; i++) {
                 auto curWordList = findGreatestWDFSReverse_R(i, j);
                 int curLength = curWordList.size();
@@ -613,7 +615,7 @@ list<string> FunctionW_R() {
 list<string> FunctionC_noR() {
     //找到入度为0的“头尾”，然后遍历这些点（“头尾”相同的作为开头只找一次)，用Dijkstra寻找最大
     //W长度为单词列表长度，C长度为单词字母总长
-    if (paramHead == 0 && paramTail == 0) { // 如果没有指定头尾
+    if (head == 0 && tail == 0) { // 如果没有指定头尾
         list<string> maxListOfWords;
         int maxLength = 0;
         for (int i = 0; i < 26; i++) {
@@ -632,18 +634,18 @@ list<string> FunctionC_noR() {
     } else {
         list<string> maxListOfWords;
         int maxLength = 0;
-        if (paramHead != 0 && paramTail != 0) { // 指定了头和尾
-            int i = fromChar2Index(paramHead);
+        if (head != 0 && tail != 0) { // 指定了头和尾
+            int i = fromChar2Index(head);
             for (int j = 0; j < 26; ++j) {
-                auto curWordList = findGreatestCDFS(i, j, paramTail);
+                auto curWordList = findGreatestCDFS(i, j, tail);
                 int curLength = getLength(curWordList);
                 if (curLength > maxLength) {
                     maxLength = curLength;
                     maxListOfWords = curWordList;
                 }
             }
-        } else if (paramHead != 0) { // 只指定了头
-            int i = fromChar2Index(paramHead);
+        } else if (head != 0) { // 只指定了头
+            int i = fromChar2Index(head);
             for (int j = 0; j < 26; ++j) {
                 auto curWordList = findGreatestCDFS(i, j);
                 int curLength = getLength(curWordList);
@@ -653,7 +655,7 @@ list<string> FunctionC_noR() {
                 }
             }
         } else { // 指定了尾
-            int j = fromChar2Index(paramTail);
+            int j = fromChar2Index(tail);
             for (int i = 0; i < 26; i++) {
                 auto curWordList = findGreatestCDFSReverse(i, j);
                 int curLength = getLength(curWordList);
@@ -670,7 +672,7 @@ list<string> FunctionC_noR() {
 list<string> FunctionC_R() {
     //找到入度为0的“头尾”，然后遍历这些点（“头尾”相同的作为开头只找一次)，用Dijkstra寻找最大
     //W长度为单词列表长度，C长度为单词字母总长
-    if (paramHead == 0 && paramTail == 0) { // 如果没有指定头尾
+    if (head == 0 && tail == 0) { // 如果没有指定头尾
         list<string> maxListOfWords;
         int maxLength = 0;
         for (int i = 0; i < 26; i++) {
@@ -687,18 +689,18 @@ list<string> FunctionC_R() {
     } else {
         list<string> maxListOfWords;
         int maxLength = 0;
-        if (paramHead != 0 && paramTail != 0) { // 指定了头和尾
-            int i = fromChar2Index(paramHead);
+        if (head != 0 && tail != 0) { // 指定了头和尾
+            int i = fromChar2Index(head);
             for (int j = 0; j < 26; ++j) {
-                auto curWordList = findGreatestCDFS_R(i, j, paramTail);
+                auto curWordList = findGreatestCDFS_R(i, j, tail);
                 int curLength = getLength(curWordList);
                 if (curLength > maxLength) {
                     maxLength = curLength;
                     maxListOfWords = curWordList;
                 }
             }
-        } else if (paramHead != 0) { // 只指定了头
-            int i = fromChar2Index(paramHead);
+        } else if (head != 0) { // 只指定了头
+            int i = fromChar2Index(head);
             for (int j = 0; j < 26; ++j) {
                 auto curWordList = findGreatestCDFS_R(i, j);
                 int curLength = getLength(curWordList);
@@ -708,7 +710,7 @@ list<string> FunctionC_R() {
                 }
             }
         } else { // 指定了尾
-            int j = fromChar2Index(paramTail);
+            int j = fromChar2Index(tail);
             for (int i = 0; i < 26; i++) {
                 auto curWordList = findGreatestCDFSReverse_R(i, j);
                 int curLength = getLength(curWordList);
@@ -721,6 +723,9 @@ list<string> FunctionC_R() {
         return maxListOfWords;
     }
 }
+
+//  aaa ab， m生效
+//此外和N_noR相同
 
 //  aaa ab， m生效
 //此外和N_noR相同
@@ -743,7 +748,6 @@ void findGreatestDj(int i, int *pred, int *predii, int *rec, int *maxDist) {
         tmp_rec = i;
 
         for (k = 0; k < 26; k++) {
-            //cout << char('a'+k) << ": " << dist[k] <<" "<< cycleFind[k] << endl;
             if (dist[k] == 0)continue;
             if (cycleFind[k])continue;
             if (dist[k] > tmp_maxDist) {
@@ -751,7 +755,6 @@ void findGreatestDj(int i, int *pred, int *predii, int *rec, int *maxDist) {
                 tmp_rec = k;
             }
         }
-        //cout << "rmp_rec " << char('a' + tmp_rec) << endl;
         if (cycleFind[tmp_rec])break;
 
         for (k = 0; k < 26; k++) {
@@ -763,9 +766,9 @@ void findGreatestDj(int i, int *pred, int *predii, int *rec, int *maxDist) {
             int weight = params['c'] ? currentWord.length() : 1;
             if (dist[tmp_rec] + weight > dist[k]) {
                 dist[k] = dist[tmp_rec] + weight;
-                if (predii == nullptr || column != row) {
+                if (column != row) {
                     pred[k] = tmp_rec;
-                } else {
+                } else if(predii != nullptr){
                     predii[k] = 1;
                 }
             }
@@ -795,11 +798,14 @@ bool getDJlist(int rec, int *pred, int *predii, int i) {
     int k = rec;
     int aa = 0;
     bool reverse = params['t'] && !params['h'];
+    cout << "====GetDJ==="<<endl;
     while (k != i && aa <= 1) {
+        //cout << char(k+'a') << "->";
         k = pred[k];
         aa++;
         if (predii != nullptr)aa += predii[k];
     }
+    //cout << k << endl;
     if (predii != nullptr) aa += predii[i];
     k = rec;
     if (aa > 1) {
@@ -813,8 +819,11 @@ bool getDJlist(int rec, int *pred, int *predii, int i) {
                 outputWordList.push_back((*alphabet[k][pred[k]]->listOfWord.begin())->wordContent);
                 k = pred[k];
             }
-            if (!params['m'] && alphabet[k][pred[k]]->listLength) {
+            /*if (!params['m'] && alphabet[k][pred[k]]->listLength) {
                 outputWordList.push_back((*alphabet[k][pred[k]]->listOfWord.begin())->wordContent);
+            }*/
+            if (predii != nullptr && predii[k]) {
+                outputWordList.push_back((*alphabet[k][k]->listOfWord.begin())->wordContent);
             }
         } else {
             while (k != i) {
@@ -825,8 +834,12 @@ bool getDJlist(int rec, int *pred, int *predii, int i) {
                 outputWordList.push_front((*alphabet[pred[k]][k]->listOfWord.begin())->wordContent);
                 k = pred[k];
             }
-            if (!params['m'] && alphabet[pred[k]][k]->listLength) {
+            /*if (!params['m'] && alphabet[pred[k]][k]->listLength) {
                 outputWordList.push_front((*alphabet[pred[k]][k]->listOfWord.begin())->wordContent);
+            }*/
+            if (predii != nullptr && predii[k]) {
+                outputWordList.push_front((*alphabet[k][k]->listOfWord.begin())->wordContent);
+                //k = pred[k];
             }
         }
         return true;
@@ -838,7 +851,7 @@ bool getDJlist(int rec, int *pred, int *predii, int i) {
 void FunctionWC_noR() {
     //找到入度为0的“头尾”，然后遍历这些点（“头尾”相同的作为开头只找一次)，用Dijkstra寻找最大
     //W长度为单词列表长度，C长度为单词字母总长
-    int i, j, k;
+    int i;
     int pred[26] = {0};
     int predii[26] = {0};
     int maxAll = 0;
@@ -873,7 +886,6 @@ void FunctionWC_noR() {
 
 
 
-
 //  aaa ab， m生效
 //此外和N_noR相同
 
@@ -882,6 +894,7 @@ void FunctionM() {
     //长度为单词列表长度
     int i, j, k;
     //int degree[26][2];
+    //int predii[26] = {0};
     int cycleFind[26] = {0};
     int dist[26] = {0};//noR ? length?
     int pred[26] = {0};
