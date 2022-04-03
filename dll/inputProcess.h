@@ -14,10 +14,10 @@
 #endif
 
 using namespace std;
-void inputProcess(int argc, char* argv[]);
-void testInputProcess(char* words[], int len, char portHead, char portTail,
-    bool enable_loop, char functionType);
 
 extern char paramHead;
 extern char paramTail;
 extern map<char, bool> params;
+void testInputProcess(char* words[], int len, char portHead, char portTail,
+    bool enable_loop, char functionType);
+void initAlphabet();

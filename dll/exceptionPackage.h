@@ -1,4 +1,5 @@
 #pragma once
+#pragma once
 //
 // Created by lenovo on 2022/3/29.
 //
@@ -15,6 +16,14 @@ struct MyException : public exception
     const char* what() const throw ()
     {
         return "C++ Exception";
+    }
+};
+
+struct ParamHTException : public exception
+{
+    const char* what() const throw ()
+    {
+        return "ERROR: Head or Tail Params invalid.";
     }
 };
 

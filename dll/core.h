@@ -1,5 +1,7 @@
 #pragma once
+#include "word.h"
 #include "inputProcess.h"
+#include "exceptionPackage.h"
 
 int gen_chain_word(char* words[], int len, char* result[], char head, char tail, bool enable_loop);
 //2.函数返回所有符合定义的单词链，函数返回值为单词链的总数

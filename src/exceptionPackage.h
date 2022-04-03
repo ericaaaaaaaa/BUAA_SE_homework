@@ -1,3 +1,4 @@
+#pragma once
 //
 // Created by lenovo on 2022/3/29.
 //
@@ -11,15 +12,23 @@ using namespace std;
 
 struct MyException : public exception
 {
-    const char * what () const throw ()
+    const char* what() const throw ()
     {
         return "C++ Exception";
     }
 };
 
+struct ParamHTException : public exception
+{
+    const char* what() const throw ()
+    {
+        return "ERROR: Head or Tail Params invalid.";
+    }
+};
+
 struct LoopException : public exception
 {
-    const char * what () const throw ()
+    const char* what() const throw ()
     {
         return "ERROR: contains loop.";
     }
@@ -32,7 +41,7 @@ struct ResultContainException : public exception
     }
 
     int length;
-    const char * what () const throw ()
+    const char* what() const throw ()
     {
         return "ERROR: the result list length is constrained in 20000.";
     }
@@ -40,7 +49,7 @@ struct ResultContainException : public exception
 
 struct FileException : public exception
 {
-    const char * what () const throw ()
+    const char* what() const throw ()
     {
         return "ERROR: cannot open file.";
     }
@@ -48,7 +57,7 @@ struct FileException : public exception
 
 struct DuplicatedInvalidParamException : public exception
 {
-    const char * what () const noexcept override
+    const char* what() const noexcept override
     {
         return "ERROR: duplicated parameter or invalid parameter";
     }
@@ -56,7 +65,7 @@ struct DuplicatedInvalidParamException : public exception
 
 struct HTParamEmptyException : public exception
 {
-    const char * what () const noexcept override
+    const char* what() const noexcept override
     {
         return "ERROR: a parameter is needed after -h or -t.";
     }
@@ -64,7 +73,7 @@ struct HTParamEmptyException : public exception
 
 struct HTParamIllegalException : public exception
 {
-    const char * what () const noexcept override
+    const char* what() const noexcept override
     {
         return "ERROR: illegal parameter after -h or -t.";
     }

@@ -1,4 +1,4 @@
-# stage2
+# stage3
 
 ## dll说明
 
@@ -20,10 +20,13 @@
   - 传入地址错了
   - Unicode、string : _T("core.dll");   _T是#include "tchar.h"中的宏定义 ，如果没有 _T转化也会导致错误，如果没有include直接无法编译
 - GetProcAddress
-  - 返回NULL：error = 127
-  - dll生成函数名已经出现错误了，不是你自己写的那个函数名，查看dll函数名工具：[*Dependency Walker*](http://www.dependencywalker.com/)
+  - 返回 NULL：error = 127
+  - dll 生成函数名已经出现错误了，不是你自己写的那个函数名，查看dll函数名工具：[*Dependency Walker*](http://www.dependencywalker.com/)
 
 ## bin说明
 
-bin中是由dll生成的core.dll以及Wordlist.cpp调用该dll所生成的exe简易样例，测试仍需进一步进行。
+bin 中是由 dll 生成的 core.dll 以及 Wordlist.cpp 调用该 dll 所生成的 exe 简易样例，测试仍需进一步进行。
 
+# gui 说明
+
+gui 中是图形化界面代码，会调用 bin 文件夹下的 dll 文件。

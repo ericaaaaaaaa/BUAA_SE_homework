@@ -1,8 +1,7 @@
+﻿#include "Core.h"
 //
 // Created by lenovo on 2022/3/29.
 //
-
-#include "Core.h"
 
 using namespace std;
 
@@ -25,112 +24,120 @@ public:
 };*/
 //void testInputProcess(char *words[], int len,char head,char tail,bool enable_loop, char functionType){
 
-int Core::gen_chain_word(char **words, int len, char **result, char head, char tail, bool enable_loop) {
+
+int Core::gen_chain_word(char** words, int len, char** result, char head, char tail, bool enable_loop) {
     try {
-        int resultSize = 0;
+        
         testInputProcess(words, len, head, tail, enable_loop, 'w');
         if (CycleDetection()) {
             if (enable_loop) {
                 outputWordList = FunctionW_R();
-            } else {
+            }
+            else {
                 throw LoopException();
             }
-        } else {
+        }
+        else {
             //outputWordList = FunctionW_noR();
             FunctionWC_noR();
         }
         //W最长单词链字母数量
-        resultSize = (int) outputWordList.size();
-        if (resultSize > RESULT_CONTAIN) {
-            throw ResultContainException(resultSize);
-        }
-        resultValue(result);
+        int resultSize = resultValue(result);
         return resultSize;
     }
-    catch (LoopException &e) {
+    catch (LoopException& e) {
         cout << e.what() << std::endl;
+        result[0] = (char*)e.what();
         return -1;
     }
-    catch (ResultContainException &e) {
+    catch (ResultContainException& e) {
         cout << e.what() << std::endl;
         return e.length;
     }
+    catch (ParamHTException& e) {
+        cout << e.what() << std::endl;
+        result[0] = (char*)e.what();
+        return -2;
+    }
 }
 
-int Core::gen_chains_all(char **words, int len, char **result) {
+int Core::gen_chains_all(char** words, int len, char** result) {
     try {
-        cout << "core" << endl;
+         
         testInputProcess(words, len, 0, 0, false, 'n');
         if (CycleDetection()) {
             throw LoopException();
         }
         FunctionN_noR();
         //单词链数量
-        int resultSize = (int) outputWordList.size();
-        if (resultSize > RESULT_CONTAIN) {
-            throw ResultContainException(resultSize);
-        }
-        resultValue(result);
+        int resultSize = resultValue(result);
         return resultSize;
     }
-    catch (LoopException &e) {
+    catch (LoopException& e) {
         cout << e.what() << std::endl;
-    } catch (ResultContainException &e) {
+        return -1;
+    }
+    catch (ResultContainException& e) {
         cout << e.what() << std::endl;
         return e.length;
     }
 }
 
-int Core::gen_chain_word_unique(char **words, int len, char **result) {
-    try {
+int Core::gen_chain_word_unique(char** words, int len, char** result) {
+    try { 
         testInputProcess(words, len, 0, 0, false, 'm');
         if (CycleDetection()) {
             throw LoopException();
         }
+        
         FunctionM();
         //M最长链的单词数量
-        int resultSize = (int) outputWordList.size();
-        if (resultSize > RESULT_CONTAIN) {
-            throw ResultContainException(resultSize);
-        }
-        resultValue(result);
+        int resultSize = resultValue(result);
         return resultSize;
     }
-    catch (LoopException &e) {
+    catch (LoopException& e) {
         cout << e.what() << std::endl;
-    } catch (ResultContainException &e) {
+        return -1;
+    }
+    catch (ResultContainException& e) {
         cout << e.what() << std::endl;
         return e.length;
     }
 
 }
 
-int Core::gen_chain_char(char **words, int len, char **result, char head, char tail, bool enable_loop) {
-    try {
+int Core::gen_chain_char(char** words, int len, char** result, char head, char tail, bool enable_loop) {
+    try { 
         testInputProcess(words, len, head, tail, enable_loop, 'c');
         if (CycleDetection()) {
             if (enable_loop) {
                 outputWordList = FunctionC_R();
-            } else {
+            }
+            else {
                 throw LoopException();
             }
-        } else {
+        }
+        else {
             //outputWordList = FunctionW_noR();
             FunctionWC_noR();
         }
         //c最长单词链字母数量
-        int resultSize = (int) outputWordList.size();
-        if (resultSize > RESULT_CONTAIN) {
-            throw ResultContainException(resultSize);
-        }
-        resultValue(result);
+        int resultSize = resultValue(result);
         return resultSize;
     }
-    catch (LoopException &e) {
+    catch (LoopException& e) {
         cout << e.what() << std::endl;
-    } catch (ResultContainException &e) {
+        result[0] = (char*)e.what();
+        return -1;
+    }
+    catch (ResultContainException& e) {
         cout << e.what() << std::endl;
         return e.length;
+    }
+    catch (ParamHTException& e) {
+        cout << e.what() << std::endl;
+        result[0] = (char*)e.what();
+        return -2;
     }
 }
 

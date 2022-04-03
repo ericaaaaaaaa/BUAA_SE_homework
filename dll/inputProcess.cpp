@@ -1,11 +1,6 @@
 #include "pch.h"
 #include "inputProcess.h"
-//
-// Created by lenovo on 2022/3/29.
-//
-
-#include "inputProcess.h"
-
+ 
 using namespace std;
 extern map<string, bool> dirty;
 extern WordList* alphabet[26][26];
@@ -27,13 +22,21 @@ inline int fromChar2Index(char c) {
     return c - 'a';
 }
 
+inline bool isLegalFilename(const string& name) {
+    size_t len = name.length(); // .txt
+    if (len > 3 && name[len - 1] == 't' && name[len - 2] == 'x'
+        && name[len - 3] == 't' && name[len - 4] == '.') return true;
+    return false;
+}
+
 void insertWord(string wordContent) {
     if (dirty.find(wordContent) == dirty.end()) {
         dirty[wordContent] = false;
         int length = (int)wordContent.length();
+        int tmpLenth = length - 1;
         auto* newWord = new Word(length, wordContent);
         auto* wordList = alphabet[fromChar2Index(wordContent[0])]
-            [fromChar2Index(wordContent[length - 1])];
+            [fromChar2Index(wordContent[tmpLenth])];
         wordList->listLength++;
         if (params['c']) {
             auto iter = wordList->listOfWord.begin();
@@ -50,39 +53,41 @@ void insertWord(string wordContent) {
 }
 
 
-// 读入文件中的文本
-void readWordFromFile() {
-    ifstream inputFile;
-    inputFile.open(fileName, ios::in);
-    if (inputFile.good()) { // 可以正常读入
-        inputFile >> noskipws; // 单个字母读入
-        char current;
-        string wordContent;
-        while (inputFile.peek() != EOF) {
-            inputFile >> current;
-            if (isalpha(current)) {
-                if (!islower(current)) {
-                    current = 'a' + (current - 'A');
+    // 读入文件中的文本
+/*
+    void readWordFromFile() {
+        ifstream inputFile;
+        inputFile.open(fileName, ios::in);
+        if (inputFile.good()) { // 可以正常读入
+            inputFile >> noskipws; // 单个字母读入
+            char current;
+            string wordContent;
+            while (inputFile.peek() != EOF) {
+                inputFile >> current;
+                if (isalpha(current)) {
+                    if (!islower(current)) {
+                        current = 'a' + (current - 'A');
+                    }
+                    wordContent += current;
                 }
-                wordContent += current;
-            }
-            else {
-                if (wordContent.length() > 1) {
-                    insertWord(wordContent);
+                else {
+                    if (wordContent.length() > 1) {
+                        insertWord(wordContent);
+                    }
+                    wordContent = "";
                 }
-                wordContent = "";
             }
-        }
-        if (wordContent.length() > 1) {
-            insertWord(wordContent);
-        }
-        inputFile.close();
+            if (wordContent.length() > 1) {
+                insertWord(wordContent);
+            }
+            inputFile.close();
 
+        }
+        else { // 文件不存在
+            throw "ERROR: cannot open file."; // TODO catch error
+        }
     }
-    else { // 文件不存在
-        throw "ERROR: cannot open file."; // TODO catch error
-    }
-}
+    */
 
 void readWordFromPort(char* words[], int len) {
 
@@ -102,16 +107,29 @@ void readWordFromPort(char* words[], int len) {
 void initAlphabet() { // 初始化 alphabet
     for (int i = 0; i < 26; ++i) {
         for (int j = 0; j < 26; ++j) {
+            if (alphabet[i][j] != NULL) {
+                alphabet[i][j]->~WordList();
+            }
             list<Word*> listOfWord;
             auto* wordList = new WordList(listOfWord);
             alphabet[i][j] = wordList;
         }
+        degree[i][0] = 0;
+        degree[i][1] = 0;
     }
+    for (auto iter = params.begin(); iter != params.end(); iter++) {
+        iter->second = false;
+    }
+    if (!outputWordList.empty())outputWordList.clear();
+    if (!dirty.empty()) dirty.clear();
+    paramHead = 0;
+    paramTail = 0;
 }
 
 // 分析命令行参数
+/*
 void analyzeParam(int argc, char* argv[]) {
-    regex reg(".*\.txt"); // 正则表达式
+    //regex reg(".*\.txt"); // 正则表达式
     for (int i = 1; i < argc; ++i) {
         string arg = argv[i];
         //cout << arg << endl;
@@ -146,7 +164,7 @@ void analyzeParam(int argc, char* argv[]) {
                 }
             }
             else {
-                if (regex_match(arg, reg)) {
+                if (isLegalFilename(arg)) {
                     if (fileName.empty()) {
                         fileName = arg;
                     }
@@ -161,7 +179,7 @@ void analyzeParam(int argc, char* argv[]) {
         }
         else
         {
-            if (regex_match(arg, reg)) {
+            if (isLegalFilename(arg)) {
                 if (fileName.empty()) {
                     fileName = arg;
                 }
@@ -191,28 +209,45 @@ void analyzeParam(int argc, char* argv[]) {
     }
 
 }
+*/
 
-void analyseParam(char portHead, char portTail, bool enable_loop, char functionType) {
-    if (portHead != 0) {
-        params['h'] = true;
-        paramHead = portHead;
+void analyseParam(char portHead, char portTail, bool enable_loop, char functionType)throw(ParamHTException)
+{
+    try {
+
+        if (portHead != 0) {
+            if (!isalpha(portHead)) {
+                throw ParamHTException();
+            }
+            params['h'] = true;
+            paramHead = portHead;
+
+        }
+        if (portTail != 0) {
+            if (!isalpha(portTail)) {
+                throw ParamHTException();
+            }
+            params['t'] = true;
+            paramTail = portTail;
+        }
+        if (enable_loop) {
+            params['r'] = true;
+        }
+        if (functionType == 'm' || functionType == 'w'
+            || functionType == 'c' || functionType == 'n') {
+            params[functionType] = true;
+        }
+        else {
+            throw ParamHTException();
+            return;
+        }
     }
-    if (portTail != 0) {
-        params['t'] = true;
-        paramTail = portTail;
-    }
-    if (enable_loop) {
-        params['r'] = true;
-    }
-    if (functionType == 'm' || functionType == 'w'
-        || functionType == 'c' || functionType == 'n') {
-        params[functionType] = true;
-    }
-    else {
-        throw "ERROR: coding error, check caller.";
+    catch (ParamHTException& e) {
+        throw;
     }
 }
 
+/*
 void inputProcess(int argc, char* argv[]) {
     initAlphabet();
     analyzeParam(argc, argv);
@@ -221,6 +256,7 @@ void inputProcess(int argc, char* argv[]) {
     //cout << "====== FILE READ INPUT END=======" << endl;
 
 }
+*/
 
 void testInputProcess(char* words[], int len, char portHead, char portTail, bool enable_loop, char functionType) {
     initAlphabet();
@@ -228,6 +264,5 @@ void testInputProcess(char* words[], int len, char portHead, char portTail, bool
     readWordFromPort(words, len);
     initGraph();
     //cout << "====== PORT READ INPUT END=======" << endl;
-
 }
 

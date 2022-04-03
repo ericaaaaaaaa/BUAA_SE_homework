@@ -1,15 +1,11 @@
-//
-// Created by lenovo on 2022/3/29.
-//
-
-#ifndef CLIONWORDLIST_CORE_H
+﻿#ifndef CLIONWORDLIST_CORE_H
 #define CLIONWORDLIST_CORE_H
 #include "word.h"
 #include "inputProcess.h"
 #include "exceptionPackage.h"
 #endif //CLIONWORDLIST_CORE_H
 
-class Core{
+class Core {
 
 public:
     //words为输入的单词列表，len为单词列表的长度，result存放单词链，函数返回值为单词链长度。

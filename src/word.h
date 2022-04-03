@@ -27,11 +27,18 @@ class WordList {
 public:
     list<Word *> listOfWord;
     int listLength;
+    WordList(list<Word*> tmpListOfWord) {
+        listOfWord = listOfWord;
+        listLength = 0;
+    }
+    ~WordList() {
+        listOfWord.clear();
+    }
 };
 
 void initGraph();
 
-void resultValue(char **result);
+int resultValue(char **result);
 
 /*------Cycle---------*/
 //bool CycleVisitDetection(int i, int *, int *);
@@ -74,7 +81,6 @@ list<string> FunctionC_R();
 
 void FunctionWC_noR();
 
-void FunctionM0();
 void FunctionM();
 //-------------------
 
