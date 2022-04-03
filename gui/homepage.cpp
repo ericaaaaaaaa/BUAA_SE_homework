@@ -12,6 +12,7 @@
 #include "windows.h"
 #include "form.h"
 #include "tchar.h"
+//#include "pair.h"
 
 using namespace std;
 //extern "C"
@@ -71,7 +72,7 @@ int main(int argc, char* argv[]) {
         cout << "cannot find function -m";
         return 0;
     }
-    cout << "finish load function" << endl;
+    //cout << "finish load function" << endl;
     // start GUI
     QApplication a(argc, argv);
     auto *hw = new QWidget();    //main GUI window
@@ -147,8 +148,8 @@ int main(int argc, char* argv[]) {
         }
         //cout << "CheckBox -n " << createUi.checkBoxN->isChecked();
         // 读入文本框中的单词
-        //char** words = (char**)malloc(20000 * sizeof(char*));
-        char* words[20000];
+        char** words = (char**)malloc(20000 * sizeof(char*));
+        //char* words[20000];
         string inputString = createUi.textEdit_input->toPlainText().toStdString();
         size_t strLen = inputString.length();
         string currentWord;
@@ -166,6 +167,7 @@ int main(int argc, char* argv[]) {
                     words[wordCount] = (char*)malloc((currentWord.length() + 1) * sizeof(char));
                     //strcpy_s(words[wordCount++], currentWord.length() + 1, currentWord.data());
                     strcpy(words[wordCount++], currentWord.c_str());
+                    //words[wordCount] = (char*)currentWord.c_str();
                     //words[wordCount] = currentWord.c_str;
                     //cout << "copy finished" << endl;
                 }
@@ -199,12 +201,13 @@ int main(int argc, char* argv[]) {
                 createUi.lineEdit_T->setReadOnly(false);
                 return;
             }
-            cout << "function -n is legal. Start running..." << endl;
+            //cout << "function -n is legal. Start running..." << endl;
             // int gen_chains_all(char* words[], int len, char* result[])
             // 返回所有符合定义的单词链，函数返回值为单词链的总数
             char* result[20000] = { 0 };
             int returnValue = N(words, wordCount, result);
-            cout << "Proccess finished. Return value " << returnValue << endl;
+            //int returnValue = gen_chains_all(words, wordCount, result);
+            //cout << "Proccess finished. Return value " << returnValue << endl;
             if (returnValue > 20000) { // 返回单词链数过长
                 createUi.textBrowser->setText("ERROR: output text is too long");
                 free(words);
