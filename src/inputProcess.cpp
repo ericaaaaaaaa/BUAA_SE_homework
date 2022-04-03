@@ -230,7 +230,7 @@ void analyzeParam(int argc, char* argv[]) {
 void readWordFromFile() {
     ifstream inputFile;
     inputFile.open(fileName, ios::in);
-    if (inputFile.good()) { // 可以正常读入
+    if (inputFile.good() && inputFile.is_open()) { // 可以正常读入
         inputFile >> noskipws; // 单个字母读入
         char current;
         string wordContent;
