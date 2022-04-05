@@ -12,6 +12,9 @@
 #include "windows.h"
 #include "form.h"
 #include "tchar.h"
+//#include "pair.h"
+
+#pragma execution_character_set("utf-8")
 
 using namespace std;
 //extern "C"
@@ -20,6 +23,11 @@ typedef int(*functionN)(char* words[], int len, char* result[]);
 typedef int(*functionM)(char* words[], int len, char* result[]);
 typedef int(*functionW)(char* words[], int len, char* result[], char head, char tail, bool enable_loop);
 typedef int(*functionC)(char* words[], int len, char* result[], char head, char tail, bool enable_loop);
+
+typedef int (*chain_word)(char* [], int, char* [], char, char, bool);
+typedef int (*chain_all)(char* [], int, char* []);
+typedef int (*chain_word_unique)(char* [], int, char* []);
+typedef int (*chain_char)(char* [], int, char* [], char, char, bool);
 
 inline bool isLegalFilename(const string& name) {
     size_t len = name.length(); // .txt
@@ -33,17 +41,40 @@ int main(int argc, char* argv[]) {
     HMODULE hModule;
     hModule = LoadLibrary(TEXT("../bin/core.dll"));
     if (hModule == nullptr) {
-        cout<<GetLastError()<<endl;
+        //cout<<GetLastError()<<endl;
         cout << "dll doesn't exist" << endl;
         return 0;
     }
-    string str = "./core.dll";
-    LPCSTR path = str.c_str();
 
+    chain_word W = (chain_word)GetProcAddress(hModule, "gen_chain_word");
+    chain_all N = (chain_all)GetProcAddress(hModule, "gen_chains_all");
+    chain_word_unique M = (chain_word_unique)GetProcAddress(hModule, "gen_chain_word_unique");
+    chain_char C = (chain_char)GetProcAddress(hModule, "gen_chain_char");
+    //string str = "./Core_pair.dll";
+    //LPCSTR path = str.c_str();
+    /*
     functionC C = (functionC)GetProcAddress(hModule, "gen_chain_char");
     functionW W = (functionW)GetProcAddress(hModule, "gen_chain_word");
     functionN N = (functionN)GetProcAddress(hModule, "gen_chains_all");
     functionM M = (functionM)GetProcAddress(hModule, "gen_chain_word_unique");
+    */
+    if (C == NULL) {
+        cout << "cannot find function -c";
+        return 0;
+    }
+    if (N == NULL) {
+        cout << "cannot find function -n";
+        return 0;
+    }
+    if (W == NULL) {
+        cout << "cannot find function -w";
+        return 0;
+    }
+    if (M == NULL) {
+        cout << "cannot find function -m";
+        return 0;
+    }
+    //cout << "finish load function" << endl;
     // start GUI
     QApplication a(argc, argv);
     auto *hw = new QWidget();    //main GUI window
@@ -58,11 +89,11 @@ int main(int argc, char* argv[]) {
         //qDebug() << "-n: " << createUi.checkBoxN->isChecked();
         //createUi.textBrowser->setText("haha\nhehe");
         // 防止在处理时 checkBox 被更改
-        cout << "CheckBox -n " << createUi.checkBoxN->isChecked();
+        //cout << "CheckBox -n " << createUi.checkBoxN->isChecked();
         createUi.textEdit_input->setReadOnly(true); // 先将输入框设为只读
         createUi.lineEdit_H->setReadOnly(true);
         createUi.lineEdit_T->setReadOnly(true);
-        cout << "CheckBox -n " << createUi.checkBoxN->isChecked();
+        //cout << "CheckBox -n " << createUi.checkBoxN->isChecked();
         // 读入 -h 和 -t，并判断是否合法
         char head = 0, tail = 0;
         if (createUi.checkBox_H->isChecked()) {
@@ -117,15 +148,17 @@ int main(int argc, char* argv[]) {
                 */
             }
         }
-        cout << "CheckBox -n " << createUi.checkBoxN->isChecked();
+        //cout << "CheckBox -n " << createUi.checkBoxN->isChecked();
         // 读入文本框中的单词
         char** words = (char**)malloc(20000 * sizeof(char*));
+        //char* words[20000];
         string inputString = createUi.textEdit_input->toPlainText().toStdString();
+        //string inputString = std::string((const char*)createUi.textEdit_input->toPlainText().toLocal8Bit().constData());
         size_t strLen = inputString.length();
         string currentWord;
         int wordCount = 0;
-        cout << "Reading words from input text..." << endl;
-        cout << "Print inputString: " << inputString << endl;
+        //cout << "Reading words from input text..." << endl;
+        //cout << "Print inputString: " << inputString << endl;
         for (size_t i = 0; i < strLen; ++i) {
             char curChar = inputString[i];
             if (isalpha(curChar)) {
@@ -133,15 +166,17 @@ int main(int argc, char* argv[]) {
             }
             else {
                 if (currentWord.length() > 1) {
-                    cout << "ready to copy word: " << currentWord << endl;
+                    //cout << "ready to copy word: " << currentWord << endl;
                     words[wordCount] = (char*)malloc((currentWord.length() + 1) * sizeof(char));
                     //strcpy_s(words[wordCount++], currentWord.length() + 1, currentWord.data());
                     strcpy(words[wordCount++], currentWord.c_str());
-                    cout << "copy finished" << endl;
+                    //words[wordCount] = (char*)currentWord.c_str();
+                    //words[wordCount] = currentWord.c_str;
+                    //cout << "copy finished" << endl;
                 }
                 currentWord.clear();
             }
-            if (wordCount >= 20000) {
+            if (wordCount > 10000 || (createUi.checkBox_R->isChecked() && wordCount > 100)) {
                 createUi.textBrowser->setText("ERROR: input text is too long");
                 free(words);
                 createUi.textEdit_input->setReadOnly(false);
@@ -154,10 +189,10 @@ int main(int argc, char* argv[]) {
             words[wordCount] = (char*)malloc((currentWord.length() + 1) * sizeof(char));
             strcpy(words[wordCount++], currentWord.c_str());
         }
-        cout << "Reading words finished. Total: " << wordCount << endl;
+        //cout << "Reading words finished. Total: " << wordCount << endl;
         // 查看是否有各种参数 & 选择函数进行处理 & 判断参数组合合法性
         if (createUi.checkBoxN->isChecked()) { 
-            cout << "In function -n" << endl;
+            //cout << "In function -n" << endl;
             // 检查合法性
             if (createUi.checkBox_W->isChecked() || createUi.checkBox_C->isChecked() ||
                 createUi.checkBox_H->isChecked() || createUi.checkBox_T->isChecked() ||
@@ -169,12 +204,13 @@ int main(int argc, char* argv[]) {
                 createUi.lineEdit_T->setReadOnly(false);
                 return;
             }
-            cout << "function -n is legal. Start running..." << endl;
+            //cout << "function -n is legal. Start running..." << endl;
             // int gen_chains_all(char* words[], int len, char* result[])
             // 返回所有符合定义的单词链，函数返回值为单词链的总数
             char* result[20000] = { 0 };
             int returnValue = N(words, wordCount, result);
-            cout << "Proccess finished. Return value " << returnValue << endl;
+            //int returnValue = gen_chains_all(words, wordCount, result);
+            //cout << "Proccess finished. Return value " << returnValue << endl;
             if (returnValue > 20000) { // 返回单词链数过长
                 createUi.textBrowser->setText("ERROR: output text is too long");
                 free(words);
@@ -193,6 +229,7 @@ int main(int argc, char* argv[]) {
             }
             // 打印结果
             string ret = to_string(returnValue) + "\n";
+            //cout << ret << endl;
             for (int i = 0; i < returnValue; ++i) {
                 ret += string(result[i]) + "\n";
             }
@@ -211,9 +248,9 @@ int main(int argc, char* argv[]) {
                 return;
             }
             char* result[20000] = { 0 };
-            cout << "WWW: head: " << head << endl;
+            //cout << "WWW: head: " << head << endl;
             int returnValue = W(words, wordCount, result, head, tail, createUi.checkBox_R->isChecked());
-            cout << "Proccess finished. Return value " << returnValue << endl;
+            //cout << "Proccess finished. Return value " << returnValue << endl;
             if (returnValue > 20000) { // 返回单词链数过长
                 createUi.textBrowser->setText("ERROR: output text is too long");
                 free(words);
@@ -255,7 +292,7 @@ int main(int argc, char* argv[]) {
             }
             char* result[20000] = { 0 };
             int returnValue = C(words, wordCount, result, head, tail, createUi.checkBox_R->isChecked());
-            cout << "Proccess finished. Return value " << returnValue << endl;
+            //cout << "Proccess finished. Return value " << returnValue << endl;
             if (returnValue > 20000) { // 返回单词链数过长
                 createUi.textBrowser->setText("ERROR: output text is too long");
                 free(words);
@@ -289,7 +326,7 @@ int main(int argc, char* argv[]) {
         else if (createUi.checkBox_M->isChecked()) {
             char* result[20000] = { 0 };
             int returnValue = M(words, wordCount, result);
-            cout << "Proccess finished. Return value " << returnValue << endl;
+            //cout << "Proccess finished. Return value " << returnValue << endl;
             if (returnValue > 20000) { // 返回单词链数过长
                 createUi.textBrowser->setText("ERROR: output text is too long");
                 free(words);
@@ -322,9 +359,9 @@ int main(int argc, char* argv[]) {
             return;
         }
         // 释放空间
-        cout << "About to free" << endl;
+        //cout << "About to free" << endl;
         free(words);
-        cout << "free finished" << endl;
+        //cout << "free finished" << endl;
         // 恢复可以编辑的状态
         createUi.textEdit_input->setReadOnly(false); // 先将输入框设为只读
         createUi.lineEdit_H->setReadOnly(false);
@@ -339,10 +376,15 @@ int main(int argc, char* argv[]) {
                 QObject::tr("Text files(*.txt);;")
         );
         if (isLegalFilename(strSrcName.toStdString())) {
-            ifstream t(strSrcName.toStdString());
-            string str((std::istreambuf_iterator<char>(t)),
-                std::istreambuf_iterator<char>());
-            createUi.textEdit_input->setText(QString::fromStdString(str));
+            //ifstream t(strSrcName.toStdString());
+            //string str((std::istreambuf_iterator<char>(t)),
+                //std::istreambuf_iterator<char>());
+            //createUi.textEdit_input->setText(QString::fromStdString(str));
+            QFile file(strSrcName);
+            file.open(QIODevice::ReadOnly);
+            QByteArray array = file.readAll();
+            createUi.textEdit_input->setText(array);
+            file.close();
         }
         else {
             createUi.textBrowser->setText("ERROR: filename illegal");
@@ -350,12 +392,26 @@ int main(int argc, char* argv[]) {
     });
     // 导出文本
     QWidget::connect(createUi.pushButton_export, &QPushButton::clicked, [&]{
+        /*
         QString output = createUi.textBrowser->toPlainText();
         QFile outputFile;
         outputFile.setFileName("./solution.txt");
         if(outputFile.open(QIODevice::WriteOnly |QIODevice::Text)){
             QTextStream stream(&outputFile);
             stream << output  << endl;
+            outputFile.close();
+        }
+        */
+        QString curPath = QCoreApplication::applicationDirPath();//返回应用程序可执行文件所在的目录
+        QString dlgTitle = "保存文件";
+        QString filter = "txt文件(*.txt)";
+        QString aFileName = QFileDialog::getSaveFileName(hw, dlgTitle, curPath, filter);
+        QFile outputFile;
+        outputFile.setFileName(aFileName);
+        QString output = createUi.textBrowser->toPlainText();
+        if (outputFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            QTextStream stream(&outputFile);
+            stream << output << endl;
             outputFile.close();
         }
     });
