@@ -14,6 +14,8 @@
 #include "tchar.h"
 //#include "pair.h"
 
+#pragma execution_character_set("utf-8")
+
 using namespace std;
 //extern "C"
 
@@ -151,6 +153,7 @@ int main(int argc, char* argv[]) {
         char** words = (char**)malloc(20000 * sizeof(char*));
         //char* words[20000];
         string inputString = createUi.textEdit_input->toPlainText().toStdString();
+        //string inputString = std::string((const char*)createUi.textEdit_input->toPlainText().toLocal8Bit().constData());
         size_t strLen = inputString.length();
         string currentWord;
         int wordCount = 0;
@@ -173,7 +176,7 @@ int main(int argc, char* argv[]) {
                 }
                 currentWord.clear();
             }
-            if (wordCount >= 20000) {
+            if (wordCount > 10000 || (createUi.checkBox_R->isChecked() && wordCount > 100)) {
                 createUi.textBrowser->setText("ERROR: input text is too long");
                 free(words);
                 createUi.textEdit_input->setReadOnly(false);
@@ -226,6 +229,7 @@ int main(int argc, char* argv[]) {
             }
             // 打印结果
             string ret = to_string(returnValue) + "\n";
+            //cout << ret << endl;
             for (int i = 0; i < returnValue; ++i) {
                 ret += string(result[i]) + "\n";
             }
@@ -372,10 +376,15 @@ int main(int argc, char* argv[]) {
                 QObject::tr("Text files(*.txt);;")
         );
         if (isLegalFilename(strSrcName.toStdString())) {
-            ifstream t(strSrcName.toStdString());
-            string str((std::istreambuf_iterator<char>(t)),
-                std::istreambuf_iterator<char>());
-            createUi.textEdit_input->setText(QString::fromStdString(str));
+            //ifstream t(strSrcName.toStdString());
+            //string str((std::istreambuf_iterator<char>(t)),
+                //std::istreambuf_iterator<char>());
+            //createUi.textEdit_input->setText(QString::fromStdString(str));
+            QFile file(strSrcName);
+            file.open(QIODevice::ReadOnly);
+            QByteArray array = file.readAll();
+            createUi.textEdit_input->setText(array);
+            file.close();
         }
         else {
             createUi.textBrowser->setText("ERROR: filename illegal");
